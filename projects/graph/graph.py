@@ -3,56 +3,118 @@ Simple graph implementation
 """
 from util import Stack, Queue  # These may come in handy
 
+
 class Graph:
     """Represent a graph as a dictionary of vertices mapping labels to edges."""
+
     def __init__(self):
         self.vertices = {}
+
     def add_vertex(self, vertex):
         """
         Add a vertex to the graph.
         """
-        pass  # TODO
+        self.vertices[vertex] = set()
+
     def add_edge(self, v1, v2):
         """
         Add a directed edge to the graph.
         """
-        pass  # TODO
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+        else:
+            raise IndexError("The vertex does not exist")
+
     def bft(self, starting_vertex):
         """
         Print each vertex in breadth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
+        # create an empty queue and enqueue the starting node ID
+        q = Queue()
+        q.enqueue(starting_vertex)
+        # create a set to store the visited nodes
+        visited = set()
+        # While the queue is not empty
+        while q.size() > 0:
+            v = q.dequeue()
+            # if the current node has not been visited
+            if v not in visited:
+                # mark as visted. print v and add v to visited set
+                print(v)
+                visited.add(v)
+                # then add all of it's neougbours to the back of the queue
+                for next_node in self.vertices[v]:
+                    q.enqueue(next_node)
+
     def dft(self, starting_vertex):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         """
-        pass  # TODO
-    def dft_recursive(self, starting_vertex):
+        # create an empty stack and push the starting node ID
+        s = Stack()
+        s.push(starting_vertex)
+        # create a set to store the visited nodes
+        visited = set()
+        # While the stack is not empty
+        while s.size() > 0:
+            v = s.pop()
+            # if the current node has not been visited
+            if v not in visited:
+                # mark as visted. print v and add v to visited set
+                print(v)
+                visited.add(v)
+                # then add all of it's neougbours onto the stack
+                for next_node in self.vertices[v]:
+                    s.push(next_node)
+
+    def dft_recursive(self, starting_vertex, visited=None):
         """
         Print each vertex in depth-first order
         beginning from starting_vertex.
         This should be done using recursion.
         """
-        pass  # TODO
+        if visited == None:
+            visited = set()
+        print(starting_vertex)
+        visited.add(starting_vertex)
+
+        for neighbour in self.vertices[starting_vertex]:
+            if neighbour not in visited:
+                self.dft_recursive(neighbour, visited)
+
     def bfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing the shortest path from
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        q = Queue()
+        q.enqueue((starting_vertex, [starting_vertex]))
+        while q.size() > 0:
+            v = q.dequeue()
+            for neighbour in self.vertices[v[0]]:
+                if neighbour == destination_vertex:
+                    return v[1] + [neighbour]
+                else:
+                    q.enqueue((neighbour, v[1] + [neighbour]))
+
     def dfs(self, starting_vertex, destination_vertex):
         """
         Return a list containing a path from
         starting_vertex to destination_vertex in
         depth-first order.
         """
-        pass  # TODO
-
-
-
+        s = Stack()
+        s.push((starting_vertex, [starting_vertex]))
+        while s.size() > 0:
+            v = s.pop()
+            for neighbour in self.vertices[v[0]]:
+                if neighbour == destination_vertex:
+                    return v[1] + [neighbour]
+                else:
+                    s.push((neighbour, v[1] + [neighbour]))
 
 
 if __name__ == '__main__':
