@@ -4,6 +4,7 @@ class User:
     def __init__(self, name):
         self.name = name
 
+
 class SocialGraph:
     def __init__(self):
         self.lastID = 0
@@ -49,6 +50,22 @@ class SocialGraph:
         # Add users
 
         # Create friendships
+        # generate all possible friendship combinations
+        # create empty possibleFriendships list
+
+        # Avoid duplicates by ensuring the first number is smaller than the second one
+        # loop over userID's in the self.users
+        # loop over friendID's in a range from userID + 1, to lastID + 1)
+        # append a tuple of (userID, friendID) to the possibleFriendships list
+
+        # shuffle possible friendships using random.shuffle()
+
+        # create friendchips for the first X pair of the list
+        # X is determined by the formula: numUsers * avgFriendships // 2
+        # Needed to divide by 2 since each addFriendship() creates 2 friendships
+        # loop over a range of numUsers * avgFriendships // 2...
+        # set friendship to possibleFriendships at the index
+        # addFriendship using a tuple of (friendship[0], friendship[1])
 
     def getAllSocialPaths(self, userID):
         """

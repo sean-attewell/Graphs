@@ -53,9 +53,11 @@ def earliest_ancestor(ancestors, starting_node):
     graph = Graph()
     path_store = []
     unique_set = set()
+    # make a set to get all unique values
     for tup in ancestors:
         unique_set.add(tup[0])
         unique_set.add(tup[1])
+    # make a node for eah new value
     for value in unique_set:
         graph.add_vertex(value)
     # Build edges in reverse
