@@ -71,28 +71,14 @@ def fisher_yates_shuffle(l):
         l[i] = swap
 
 
-# traversalPath = ["n", "s"]
-
-# some sort of function to backtrack to the unexplores areas think BFT
-
-
-def backtrack_to_unexplored(player, movesQueue):
-    pass
-
-# some sort of function to enqueue moves
-
-
-def enqueue_moves(player, movesQueue):
-
-    pass
-
-
 # possibly set up a dictionary of inverse directions
 traversalPath = []
 traversal_graph = {}
+dft_counter = 0
 
 
 def dft(player):
+    dft_counter = 0
     # add starting room to traversal graph
     if player.currentRoom.id not in traversal_graph:
         traversal_graph[player.currentRoom.id] = {}
@@ -106,54 +92,50 @@ def dft(player):
     for key in traversal_graph[player.currentRoom.id]:
         if traversal_graph[player.currentRoom.id][key] == "?":
             unexplored.append(key)
-    fisher_yates_shuffle(unexplored)
-    s.push(unexplored[0])
 
-    # initial_directions = player.currentRoom.getExits()
-    # fisher_yates_shuffle(initial_directions)
-    # s.push(initial_directions[0])
+    if len(unexplored) > 0:
+        fisher_yates_shuffle(unexplored)
+        s.push(unexplored[0])
 
-    while s.size() > 0:
-        prev_room_id = player.currentRoom.id
-        direction_moved = s.pop()
-        player.travel(direction_moved)
-        traversalPath.append(direction_moved)
+        while s.size() > 0:
+            prev_room_id = player.currentRoom.id
+            direction_moved = s.pop()
+            player.travel(direction_moved)
+            traversalPath.append(direction_moved)
+            dft_counter += 1
 
-        if player.currentRoom.id not in traversal_graph:
-            traversal_graph[player.currentRoom.id] = {}
-            possible_directions = player.currentRoom.getExits()
-            for d in possible_directions:
-                traversal_graph[player.currentRoom.id][d] = "?"
-            # print(traversal_graph)
+            if player.currentRoom.id not in traversal_graph:
+                traversal_graph[player.currentRoom.id] = {}
+                possible_directions = player.currentRoom.getExits()
+                for d in possible_directions:
+                    traversal_graph[player.currentRoom.id][d] = "?"
 
-        if direction_moved == "n":
-            traversal_graph[prev_room_id]["n"] = player.currentRoom.id
-            traversal_graph[player.currentRoom.id]["s"] = prev_room_id
-        elif direction_moved == "s":
-            traversal_graph[prev_room_id]["s"] = player.currentRoom.id
-            traversal_graph[player.currentRoom.id]["n"] = prev_room_id
-        elif direction_moved == "e":
-            traversal_graph[prev_room_id]["e"] = player.currentRoom.id
-            traversal_graph[player.currentRoom.id]["w"] = prev_room_id
-        else:
-            traversal_graph[prev_room_id]["w"] = player.currentRoom.id
-            traversal_graph[player.currentRoom.id]["e"] = prev_room_id
+            if direction_moved == "n":
+                traversal_graph[prev_room_id]["n"] = player.currentRoom.id
+                traversal_graph[player.currentRoom.id]["s"] = prev_room_id
+            elif direction_moved == "s":
+                traversal_graph[prev_room_id]["s"] = player.currentRoom.id
+                traversal_graph[player.currentRoom.id]["n"] = prev_room_id
+            elif direction_moved == "e":
+                traversal_graph[prev_room_id]["e"] = player.currentRoom.id
+                traversal_graph[player.currentRoom.id]["w"] = prev_room_id
+            else:
+                traversal_graph[prev_room_id]["w"] = player.currentRoom.id
+                traversal_graph[player.currentRoom.id]["e"] = prev_room_id
 
-        # IF HITS EXPLORED ROOM WITHOUT ANY "?"
-        if "?" not in list(traversal_graph[player.currentRoom.id].values()):
-            break
-        else:  # need to only select a "?" direction
-            unexplored_2 = []
-            for key in traversal_graph[player.currentRoom.id]:
-                if traversal_graph[player.currentRoom.id][key] == "?":
-                    unexplored_2.append(key)
-            print('unexplored_2', unexplored_2)
-            fisher_yates_shuffle(unexplored_2)
-            print('unexplored_2 shuffled', unexplored_2)
-            s.push(unexplored_2[0])
+            # IF HITS EXPLORED ROOM WITHOUT ANY "?"
+            if "?" not in list(traversal_graph[player.currentRoom.id].values()):
+                break
+            else:  # need to only select a "?" direction
+                unexplored_2 = []
+                for key in traversal_graph[player.currentRoom.id]:
+                    if traversal_graph[player.currentRoom.id][key] == "?":
+                        unexplored_2.append(key)
+                fisher_yates_shuffle(unexplored_2)
+                s.push(unexplored_2[0])
 
 
-def bft(player, traversalPath):
+def bft(player):
     q = Queue()
     traversalPathCopy = traversalPath.copy()
     back_steps = -1
@@ -175,14 +157,11 @@ def bft(player, traversalPath):
         traversalPath.append(new_move)
         player.travel(new_move)
 
-        # print('new_move', new_move)
-        # print('traversalPath', traversalPath)
-        # print('back_steps', back_steps)
-        # print('traversalPathCopy', traversalPathCopy)
-        # print('-------------------------------------')
-
         # IF ROOM FULLY EXPLORED
         if "?" not in list(traversal_graph[player.currentRoom.id].values()):
+            # if back_steps * -1 >= dft_counter:
+            #     completed = True
+            #     return completed
             if back_steps * -1 >= len(traversalPathCopy):
                 completed = True
                 return completed
@@ -196,17 +175,17 @@ def bft(player, traversalPath):
             return completed
 
 
-def explore_all_rooms(player, traversalPath):
+def explore_all_rooms(player):
     completed = False
     while completed == False:
         dft(player)
-        completed = bft(player, traversalPath)
-    print("All explored - we think")
+        completed = bft(player)
+    print("All explored")
 
 # dft(player)
 
 
-explore_all_rooms(player, traversalPath)
+explore_all_rooms(player)
 print(traversal_graph)
 print("traversal_path", traversalPath)
 
