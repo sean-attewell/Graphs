@@ -43,9 +43,9 @@ class Graph:
                 # mark as visted. print v and add v to visited set
                 print(v)
                 visited.add(v)
-                # then add all of it's neougbours to the back of the queue
-                for next_node in self.vertices[v]:
-                    q.enqueue(next_node)
+                # then add all of it's neighbour to the back of the queue
+                for neighbour in self.vertices[v]:
+                    q.enqueue(neighbour)
 
     def dft(self, starting_vertex):
         """
@@ -91,14 +91,53 @@ class Graph:
         breath-first order.
         """
         q = Queue()
+        visited = set()
         q.enqueue((starting_vertex, [starting_vertex]))
         while q.size() > 0:
             v = q.dequeue()
-            for neighbour in self.vertices[v[0]]:
-                if neighbour == destination_vertex:
-                    return v[1] + [neighbour]
-                else:
-                    q.enqueue((neighbour, v[1] + [neighbour]))
+            if v[0] not in visited:
+                visited.add(v[0])
+                for neighbour in self.vertices[v[0]]:
+                    if neighbour == destination_vertex:
+                        return v[1] + [neighbour]
+                    else:
+                        q.enqueue((neighbour, v[1] + [neighbour])) 
+                    # array keeps track of path
+                    # you're only ever pushing on a neighbour
+                    # so always represents a direct path to that neighbour
+                    # doesn't seem to check if neighbour visited
+        
+    def bfs2(self, starting_vertex, destination_vertex):
+        # Create an empty queue and enqueue A PATH TO the starting vertex ID
+        # Create a Set to store visited vertices
+        # While the queue is not empty...
+        # Dequeue the first PATH
+        # Grab the last vertex from the PATH
+        # If that vertex has not been visited...
+        # CHECK IF IT'S THE TARGET
+        # IF SO, RETURN PATH
+        # Mark it as visited...
+        # Then add A PATH TO its neighbors to the back of the queue
+        # COPY THE PATH
+        # APPEND THE NEIGHOR TO THE BACK
+        # create an empty queue enqueue the staring node ID
+        q = Queue()
+        #store path to vertex instead of just vertex
+        q.enqueue([starting_vertex])
+        visited = set()
+        while q.size() > 0:
+            path = q.dequeue()
+            v = path[-1]
+            if v == destination_vertex: # can be in or out of below if
+                return path
+            if v not in visited:
+                visited.add(v)
+                for neighbour in self.vertices[v]:
+                    new_path = path.copy()
+                    new_path.append(neighbour)
+                    q.enqueue(new_path)
+        return None
+
 
     def dfs(self, starting_vertex, destination_vertex):
         """
@@ -142,6 +181,7 @@ if __name__ == '__main__':
     Should print:
         {1: {2}, 2: {3, 4}, 3: {5}, 4: {6, 7}, 5: {3}, 6: {3}, 7: {1, 6}}
     '''
+    print('-----GRAPH.VERTICES:-----')
     print(graph.vertices)
 
     '''
@@ -151,6 +191,7 @@ if __name__ == '__main__':
         1, 2, 4, 7, 6, 3, 5
         1, 2, 4, 6, 3, 5, 7
     '''
+    print('-----DFT:-----')
     graph.dft(1)
 
     '''
@@ -168,6 +209,7 @@ if __name__ == '__main__':
         1, 2, 4, 3, 7, 6, 5
         1, 2, 4, 3, 7, 5, 6
     '''
+    print('-----BFT:-----')
     graph.bft(1)
 
     '''
@@ -177,17 +219,23 @@ if __name__ == '__main__':
         1, 2, 4, 7, 6, 3, 5
         1, 2, 4, 6, 3, 5, 7
     '''
+    print('-----DFT RECURSIVE:-----')
     graph.dft_recursive(1)
 
     '''
     Valid BFS path:
         [1, 2, 4, 6]
     '''
+    print('-----BFS:-----')
     print(graph.bfs(1, 6))
+
+    print('-----BFS2:-----')
+    print(graph.bfs2(1, 6))
 
     '''
     Valid DFS paths:
         [1, 2, 4, 6]
         [1, 2, 4, 7, 6]
     '''
+    print('-----DFS:-----')
     print(graph.dfs(1, 6))
